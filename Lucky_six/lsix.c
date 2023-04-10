@@ -1,3 +1,15 @@
+/*	OPIS PROGRAMA
+* Program kreira i azurira lokalnu bazu podataka "baza.bin" iz koje se citaju i upisuju podaci
+* U bazi se skladiste podaci o korisniku u formatu --> string(korisnicko_ime)- string(lozinka)-int(broj_pobeda) int(broj_poraza)
+* Podaci se azuriraju pri svakom novom pokretanju programa, tj nalog ce cuvati svoje podatke u binarnom fajlu
+* Nakon uspesnog logovanja u nalog korisnik bira jednu ili vise igara za kladjenje
+* Klasican lucky six (redni broj 1 u izboru igara) se igra tako sto korisnik unosi 6 razlicitih brojeva u opsegu 1-48, zapisuje ih na papir i prati izvlacenje
+* Korisnik ima odgovornost da samostalno prati svoju opkladu/opklade
+* Korisnik dobija novac samo ukoliko su sve igre sa tiketa prosle
+* Na kraju programa, baza se azurira sa inkrementovanim brojem pobeda ili poraza za ulogovanog korisnika i izbacuje % ostvarivanja dobitka korisnika, kao i ukupan broj pobeda/gubitaka
+*/
+
+
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include<stdlib.h>
@@ -67,57 +79,67 @@ main()
 	float isplata;
 	Kuglica kuglice[48];
 	Kuglica* izvuceni_brojevi;
-
-	printf("1. Kreiraj nalog\n2. Uloguj se u nalog\n3. Izadji iz aplikacije");
-	do
+	while (1)
 	{
-		printf("\nUnesi svoj izbor: ");
-		scanf("%d", &izbor);
-		if (izbor < 1 || izbor>3)
-			printf("\nOpcija mora biti 1, 2 ili 3");
-	} while (izbor < 1 || izbor>3);
+		printf("1. Kreiraj nalog\n2. Uloguj se u nalog\n3. Izadji iz aplikacije");
+		do
+		{
+			printf("\nUnesi svoj izbor: ");
+			scanf("%d", &izbor);
+			if (izbor < 1 || izbor>3)
+				printf("\nOpcija mora biti 1, 2 ili 3");
+		} while (izbor < 1 || izbor>3);
 
-	switch (izbor)
-	{
-	case 1:
-		korisnik = kreiraj_nalog();
-		break;
-	case 2:
-		korisnik = login();
-		break;
-	case 3:
-		kraj_programa();
-		break;
+		switch (izbor)
+		{
+		case 1:
+			korisnik = kreiraj_nalog();
+			break;
+		case 2:
+			korisnik = login();
+			break;
+		case 3:
+			kraj_programa();
+			break;
+		}
+
+
+
+		print_izbor_igara();
+
+		setovanje_kuglica(kuglice);
+		izvuceni_brojevi = izvlacenje(kuglice);
+
+		kvota = opcije_za_kladjenje(izvuceni_brojevi);
+
+		system("cls");
+
+		do {
+			printf("\nUnesite uplatu u dinarima: ");
+			scanf("%f", &uplata);
+			if (uplata < 20)
+				printf("\nNajmanja uplata mora biti bar 20din!");
+			else if (uplata > 100000000)
+				printf("\nNajveca uplata koju mozete uneti je 100.000.000din!");
+
+		} while (uplata < 20 || uplata>100000000);
+
+		print_izvlacenje(izvuceni_brojevi);
+
+		prikazi_isplatu(kvota, uplata, korisnik);
+
+		free(izvuceni_brojevi);
+		free(korisnik);
+
+		printf("\nUnesite prazan znak za povratak na pocetni ekran...\n");
+		char izlaz;
+		scanf("%c", &izlaz); //da mi pokupi enter jer fflush stdin naravno ne radi
+		scanf("%c", &izlaz);
+		
+		system("cls");
+
 	}
 	
-	
-	
-	print_izbor_igara();
-	
-	setovanje_kuglica(kuglice);
-	izvuceni_brojevi = izvlacenje(kuglice);
-	
-	kvota = opcije_za_kladjenje(izvuceni_brojevi);
-
-	system("cls");
-
-	do {
-		printf("\nUnesite uplatu u dinarima: ");
-		scanf("%f", &uplata);
-		if (uplata < 20)
-			printf("\nNajmanja uplata mora biti bar 20din!");
-		else if (uplata > 100000000)
-			printf("\nNajveca uplata koju mozete uneti je 100.000.000din!");
-
-	} while (uplata<20 || uplata>100000000);
-
-	print_izvlacenje(izvuceni_brojevi);
-	
-	prikazi_isplatu(kvota, uplata, korisnik);
-	
-	free(izvuceni_brojevi);
-	free(korisnik);
-
 	return 0;
 }
 
